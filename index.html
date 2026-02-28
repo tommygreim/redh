@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hearts & Mana</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+    <!-- ═══════════════════════════════════════════
+         TITLE SCREEN
+    ═══════════════════════════════════════════ -->
+    <div id="screen-title" class="screen active">
+        <div class="title-bg-art">
+            <div class="floating-card fc1">❤</div>
+            <div class="floating-card fc2">✦</div>
+            <div class="floating-card fc3">◆</div>
+            <div class="floating-card fc4">❧</div>
+        </div>
+        <div class="title-container">
+            <div class="title-mana-row">
+                <span class="mana-pip W">W</span>
+                <span class="mana-pip U">U</span>
+                <span class="mana-pip B">B</span>
+                <span class="mana-pip R">R</span>
+                <span class="mana-pip G">G</span>
+            </div>
+            <h1 class="game-title">Hearts &amp; Mana</h1>
+            <p class="game-subtitle">A Deckbuilding Romance</p>
+            <p class="game-tagline">The way you play reveals who you are.</p>
+            <button class="btn-primary btn-large" onclick="App.showScreen('character-select')">Begin Your Journey</button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         CHARACTER SELECT SCREEN
+    ═══════════════════════════════════════════ -->
+    <div id="screen-character-select" class="screen">
+        <div class="screen-header">
+            <button class="btn-back" onclick="App.showScreen('title')">← Back</button>
+            <h2>Choose Your Heart's Challenge</h2>
+            <p class="screen-subtitle">Each opponent has their own tastes. Play wisely — and honestly.</p>
+        </div>
+        <div id="character-grid" class="character-grid">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         CHARACTER PROFILE SCREEN
+    ═══════════════════════════════════════════ -->
+    <div id="screen-character-profile" class="screen">
+        <div class="screen-header">
+            <button class="btn-back" onclick="App.showScreen('character-select')">← Back</button>
+        </div>
+        <div class="profile-layout">
+            <div class="profile-left">
+                <div class="character-portrait-large" id="profile-portrait"></div>
+                <div class="profile-playstyle" id="profile-playstyle"></div>
+            </div>
+            <div class="profile-right">
+                <h2 id="profile-name"></h2>
+                <p class="profile-title-line" id="profile-title-line"></p>
+                <p id="profile-description"></p>
+                <div class="relationship-stats-block" id="profile-stats">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="profile-dialogue-box" id="profile-dialogue"></div>
+                <div class="profile-actions">
+                    <button class="btn-primary" onclick="App.startGame()">▶ Play a Game</button>
+                    <button class="btn-secondary" onclick="App.showDeckSelect()">⚙ Choose Deck</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         DECK SELECT SCREEN
+    ═══════════════════════════════════════════ -->
+    <div id="screen-deck-select" class="screen">
+        <div class="screen-header">
+            <button class="btn-back" onclick="App.showCharacterProfile()">← Back</button>
+            <h2>Choose Your Approach</h2>
+            <p class="screen-subtitle">Your playstyle speaks volumes before a word is said.</p>
+        </div>
+        <div id="deck-options" class="deck-options">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         GAME SCREEN
+    ═══════════════════════════════════════════ -->
+    <div id="screen-game" class="screen">
+        <div class="game-layout">
+
+            <!-- Left sidebar: character portrait + info -->
+            <div class="game-sidebar">
+                <div class="opponent-portrait-wrap">
+                    <div class="opponent-portrait" id="game-opponent-portrait"></div>
+                    <div class="opponent-name-label" id="game-opponent-name"></div>
+                </div>
+                <div class="opponent-stats">
+                    <div class="life-orb opp-life" id="opp-life-display">
+                        <span class="life-icon">♥</span>
+                        <span id="opp-life-value">20</span>
+                    </div>
+                    <div class="opp-hand-info">Hand: <span id="opp-hand-count">7</span> | Library: <span id="opp-library-count">23</span></div>
+                </div>
+                <div class="reaction-box" id="game-reaction">
+                    <div class="reaction-text" id="reaction-text"></div>
+                </div>
+                <div class="game-log" id="game-log">
+                    <div class="log-header">Log</div>
+                    <div class="log-entries" id="log-entries"></div>
+                </div>
+            </div>
+
+            <!-- Main game area -->
+            <div class="game-main">
+
+                <!-- Opponent battlefield -->
+                <div class="battlefield-section opponent-section">
+                    <div class="section-label">Their creatures</div>
+                    <div class="battlefield" id="opp-battlefield">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Phase bar -->
+                <div class="phase-bar">
+                    <div class="phase-info">
+                        <span id="phase-turn-label" class="turn-label">Turn 1</span>
+                        <span id="phase-name" class="phase-name">Your Turn — Main Phase</span>
+                    </div>
+                    <div class="phase-actions" id="phase-actions">
+                        <!-- Buttons populated by JS -->
+                    </div>
+                    <div class="mana-info">
+                        <span class="mana-label">Mana:</span>
+                        <span id="mana-available">0</span>/<span id="mana-total">0</span>
+                    </div>
+                </div>
+
+                <!-- Player battlefield -->
+                <div class="battlefield-section player-section">
+                    <div class="section-label">Your creatures</div>
+                    <div class="battlefield" id="player-battlefield">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Player info bar -->
+                <div class="player-info-bar">
+                    <div class="life-orb player-life" id="player-life-display">
+                        <span class="life-icon">♥</span>
+                        <span id="player-life-value">20</span>
+                    </div>
+                    <div class="deck-graveyard-info">
+                        Library: <span id="player-library-count">23</span> |
+                        Graveyard: <span id="player-graveyard-count">0</span>
+                    </div>
+                </div>
+
+                <!-- Player hand -->
+                <div class="hand-section">
+                    <div class="hand-label">Your Hand (<span id="hand-count">7</span>)</div>
+                    <div class="hand-area" id="player-hand">
+                        <!-- Cards populated by JS -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Targeting overlay -->
+        <div id="targeting-overlay" class="targeting-overlay hidden">
+            <div class="targeting-panel">
+                <div class="targeting-prompt" id="targeting-prompt">Choose a target</div>
+                <div class="targeting-hint">Click a valid target below, or Cancel</div>
+                <button class="btn-secondary" onclick="Engine.cancelTargeting()">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Blocker selection overlay -->
+        <div id="blocker-overlay" class="blocker-overlay hidden">
+            <div class="blocker-panel">
+                <div class="blocker-title">Assign Blockers</div>
+                <div class="blocker-instructions">Click one of your creatures, then click an attacker to block it.</div>
+                <div id="blocker-area">
+                    <!-- Attacker/blocker UI populated by JS -->
+                </div>
+                <button class="btn-primary" onclick="Engine.confirmBlockers()">Confirm Blocks</button>
+                <button class="btn-secondary" onclick="Engine.confirmBlockers(true)">Take No Blocks</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         RESULT SCREEN
+    ═══════════════════════════════════════════ -->
+    <div id="screen-result" class="screen">
+        <div class="result-layout">
+            <div class="result-portrait-col">
+                <div class="result-portrait" id="result-portrait"></div>
+                <div class="result-outcome-badge" id="result-outcome-badge"></div>
+            </div>
+            <div class="result-info-col">
+                <h2 id="result-title"></h2>
+                <div class="result-analysis-box" id="result-analysis">
+                    <!-- Play style analysis populated by JS -->
+                </div>
+                <div class="relationship-changes-box" id="result-changes">
+                    <!-- Stat changes populated by JS -->
+                </div>
+                <div class="result-dialogue-box" id="result-dialogue">
+                    <!-- Character reaction populated by JS -->
+                </div>
+                <div class="result-actions">
+                    <button class="btn-primary" onclick="App.startGame()">Play Again</button>
+                    <button class="btn-secondary" onclick="App.showCharacterProfile()">Return to Profile</button>
+                    <button class="btn-tertiary" onclick="App.showScreen('character-select')">Choose Another</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
