@@ -144,7 +144,7 @@ const CARDS = {
         cost: 2, power: 2, toughness: 2,
         keywords: ['flying'],
         effect: null, effectValue: null, effectTarget: 'none',
-        art: '🦋', flavorText: 'What you can't quite reach only makes you want it more.',
+        art: '🦋', flavorText: "What you can't quite reach only makes you want it more.",
         romanticTheme: 'mystery',
     },
 
