@@ -235,6 +235,16 @@ const UI = {
         const mtEl = document.getElementById('mana-total');
         if (mtEl) mtEl.textContent = manaTotal;
 
+        // Colored mana pool display
+        const pool = Engine._getManaPool('player');
+        const poolEl = document.getElementById('mana-pool-display');
+        if (poolEl) {
+            poolEl.innerHTML = Object.entries(pool)
+                .filter(([, n]) => n > 0)
+                .map(([col, n]) => `<span class="mana-pip ${col} pip-sm">${n}</span>`)
+                .join('');
+        }
+
         // Battlefields
         this._renderBattlefield('opp-battlefield', state.opponent.battlefield, state, 'opponent');
         this._renderBattlefield('player-battlefield', state.player.battlefield, state, 'player');
@@ -244,6 +254,13 @@ const UI = {
 
         // Targeting overlay
         this._updateTargetingOverlay(state);
+
+        // Priority window
+        if (state.priorityWindow && state.priorityWindow.active) {
+            this.showPriorityWindow(state.priorityWindow);
+        } else {
+            this.hidePriorityWindow();
+        }
     },
 
     _renderBattlefield(containerId, permanents, state, role) {
@@ -251,9 +268,23 @@ const UI = {
         if (!container) return;
         container.innerHTML = '';
 
-        for (const perm of permanents) {
-            const el = this._makePermanentEl(perm, state, role);
-            container.appendChild(el);
+        const lands    = permanents.filter(p => !p.isToken && CARDS[p.cardId] && CARDS[p.cardId].type === 'land');
+        const nonLands = permanents.filter(p =>  p.isToken || !CARDS[p.cardId] || CARDS[p.cardId].type !== 'land');
+
+        // Creatures/spells row
+        if (nonLands.length > 0) {
+            const creatRow = document.createElement('div');
+            creatRow.className = 'battlefield-row battlefield-creatures';
+            for (const perm of nonLands) creatRow.appendChild(this._makePermanentEl(perm, state, role));
+            container.appendChild(creatRow);
+        }
+
+        // Lands row
+        if (lands.length > 0) {
+            const landRow = document.createElement('div');
+            landRow.className = 'battlefield-row battlefield-lands';
+            for (const perm of lands) landRow.appendChild(this._makePermanentEl(perm, state, role));
+            container.appendChild(landRow);
         }
     },
 
@@ -277,9 +308,10 @@ const UI = {
         }
 
         if (perm.tapped) el.classList.add('tapped');
+        if (perm.sick)   el.classList.add('sick');
 
         // Combat state highlights
-        if (state.phase === 'attack_declare' && role === 'player' && isCreature && !perm.tapped) {
+        if (state.phase === 'attack_declare' && role === 'player' && isCreature && !perm.tapped && !perm.sick) {
             el.classList.add('can-attack');
         }
         if (state.combat.attackers.includes(perm.uid)) {
@@ -395,35 +427,49 @@ const UI = {
 
     _makeCostHtml(c) {
         if (c.type === 'land') return '';
-        if (c.cost === 0) return `<span class="mana-pip C" style="width:20px;height:20px;font-size:0.6rem">0</span>`;
-
-        // Simplified: show generic mana pip with number
-        return `<span class="mana-pip ${c.color}" style="width:20px;height:20px;font-size:0.6rem">${c.cost}</span>`;
+        const cost = c.cost;
+        if (!cost || (typeof cost === 'object' && Object.keys(cost).length === 0)) {
+            return `<span class="mana-pip C pip-sm">0</span>`;
+        }
+        if (typeof cost === 'number') {
+            return `<span class="mana-pip C pip-sm">${cost}</span>`;
+        }
+        let html = '';
+        if (cost.c) html += `<span class="mana-pip C pip-sm">${cost.c}</span>`;
+        for (const [color, count] of Object.entries(cost)) {
+            if (color === 'c') continue;
+            for (let i = 0; i < count; i++) {
+                html += `<span class="mana-pip ${color} pip-sm">${color}</span>`;
+            }
+        }
+        return html;
     },
 
     _effectText(c) {
         if (!c.effect) return '';
         const v = c.effectValue;
         const vStr = Array.isArray(v) ? `+${v[0]}/+${v[1]}` : v;
+        const risqueMark = c.risque ? ' <span class="risque-mark" title="Risqué card — stat check required">✦</span>' : '';
         switch (c.effect) {
-            case FX.GAIN_LIFE:           return `Gain ${v} life.`;
-            case FX.LOSE_LIFE_DRAW:      return `Draw ${v} cards. Lose ${v} life.`;
-            case FX.DRAW_CARDS:          return `Draw ${v} card${v !== 1 ? 's' : ''}.`;
-            case FX.DRAW_SHARED:         return `Both draw ${v}. Both gain ${v} life.`;
-            case FX.DEAL_DAMAGE_ANY:     return `Deal ${v} damage to any target.`;
-            case FX.DEAL_DAMAGE_PLAYER:  return `Deal ${v} damage to opponent.`;
-            case FX.DEAL_DAMAGE_CREATURE:return `Deal ${v} damage to target creature.`;
-            case FX.DESTROY_CREATURE:    return `Destroy target creature.`;
-            case FX.DESTROY_NONLAND:     return `Destroy target non-land permanent.`;
-            case FX.OPPONENT_DISCARD:    return `Opponent discards ${v} cards.`;
-            case FX.COUNTER_SPELL:       return `Counter target spell.`;
-            case FX.BUFF_CREATURE_EOT:   return `Target creature gets ${vStr} until end of turn.`;
-            case FX.PUMP_ALL_EOT:        return `All your creatures get +${v}/+0 and haste until EOT.`;
-            case FX.ENCHANT_ALL_BUFF:    return `All your creatures get ${vStr}.`;
-            case FX.CREATE_TOKENS:       return `Create ${v} 2/2 creature tokens.`;
-            case FX.ETB_DRAW:            return `When this enters: draw ${v} card${v !== 1 ? 's' : ''}.`;
-            case FX.DIES_DEAL_DAMAGE:    return `When this dies: deal ${v} damage to any target.`;
-            default:                     return '';
+            case FX.GAIN_LIFE:           return `Gain ${v} life.${risqueMark}`;
+            case FX.LOSE_LIFE_DRAW:      return `Draw ${v} cards. Lose ${v} life.${risqueMark}`;
+            case FX.DRAW_CARDS:          return `Draw ${v} card${v !== 1 ? 's' : ''}.${risqueMark}`;
+            case FX.DRAW_SHARED:         return `Both draw ${v}. Both gain ${v} life.${risqueMark}`;
+            case FX.SCRY_DRAW:           return `Scry ${v}, then draw 1.${risqueMark}`;
+            case FX.DEAL_DAMAGE_ANY:     return `Deal ${v} damage to any target.${risqueMark}`;
+            case FX.DEAL_DAMAGE_PLAYER:  return `Deal ${v} damage to opponent.${risqueMark}`;
+            case FX.DEAL_DAMAGE_CREATURE:return `Deal ${v} damage to target creature.${risqueMark}`;
+            case FX.DESTROY_CREATURE:    return `Destroy target creature.${risqueMark}`;
+            case FX.DESTROY_NONLAND:     return `Destroy target non-land permanent.${risqueMark}`;
+            case FX.OPPONENT_DISCARD:    return `Opponent discards ${v} cards.${risqueMark}`;
+            case FX.COUNTER_SPELL:       return `Counter target spell.${risqueMark}`;
+            case FX.BUFF_CREATURE_EOT:   return `Target creature gets ${vStr} until end of turn.${risqueMark}`;
+            case FX.PUMP_ALL_EOT:        return `All your creatures get +${v}/+0 and haste until EOT.${risqueMark}`;
+            case FX.ENCHANT_ALL_BUFF:    return `All your creatures get ${vStr}.${risqueMark}`;
+            case FX.CREATE_TOKENS:       return `Create ${v} 2/2 creature tokens.${risqueMark}`;
+            case FX.ETB_DRAW:            return `When this enters: draw ${v} card${v !== 1 ? 's' : ''}.${risqueMark}`;
+            case FX.DIES_DEAL_DAMAGE:    return `When this dies: deal ${v} damage to any target.${risqueMark}`;
+            default:                     return risqueMark;
         }
     },
 
@@ -570,6 +616,76 @@ const UI = {
     },
 
     _reactionTimeout: null,
+
+    /* ─────────────────────────────────────────────────────────
+       PRIORITY WINDOW
+       ───────────────────────────────────────────────────────── */
+    showPriorityWindow(pw) {
+        const overlay = document.getElementById('priority-overlay');
+        if (!overlay) return;
+
+        const spellEl   = document.getElementById('priority-spell-info');
+        const actionsEl = document.getElementById('priority-actions');
+        if (!spellEl || !actionsEl) return;
+
+        spellEl.innerHTML = `
+            <div class="priority-spell-art">${pw.aiSpellArt || '?'}</div>
+            <div class="priority-spell-name">${pw.aiSpellName}</div>
+        `;
+
+        actionsEl.innerHTML = '';
+        for (const inst of pw.counterspells) {
+            const c = CARDS[inst.cardId];
+            if (!c) continue;
+            const btn = document.createElement('button');
+            btn.className = 'btn-primary';
+            btn.innerHTML = `Counter with <strong>${c.name}</strong> ${this._makeCostHtml(c)}`;
+            btn.addEventListener('click', () => Engine.useCounterspell(inst.uid));
+            actionsEl.appendChild(btn);
+        }
+
+        overlay.classList.remove('hidden');
+    },
+
+    hidePriorityWindow() {
+        const overlay = document.getElementById('priority-overlay');
+        if (overlay) overlay.classList.add('hidden');
+    },
+
+    /* ─────────────────────────────────────────────────────────
+       RISQUÉ OVERLAY
+       ───────────────────────────────────────────────────────── */
+    showRisqueResult(cardId, outcome, changes, risque) {
+        const overlay  = document.getElementById('risque-overlay');
+        const momentEl = document.getElementById('risque-moment');
+        const outcomeEl= document.getElementById('risque-outcome');
+        const lineEl   = document.getElementById('risque-line');
+        const changesEl= document.getElementById('risque-changes');
+        if (!overlay || !momentEl) return;
+
+        momentEl.textContent = risque.moment || '';
+        outcomeEl.className  = `risque-outcome ${outcome === 'win' ? 'risque-win' : 'risque-lose'}`;
+        outcomeEl.textContent = outcome === 'win' ? '✦ Their heart opens to you.' : '✦ Too soon. They pull back.';
+        lineEl.textContent   = outcome === 'win' ? (risque.winLine || '') : (risque.loseLine || '');
+
+        // Stat changes display
+        const statLabels = { love: '❤ Love', attraction: '💕 Attraction', inhibition: '🔒 Inhibition', control: '⚖ Control' };
+        let changesHtml = '';
+        for (const [stat, delta] of Object.entries(changes)) {
+            if (delta === 0) continue;
+            const sign  = delta > 0 ? '+' : '';
+            const cls   = delta > 0 ? 'pos' : 'neg';
+            changesHtml += `<span class="risque-stat-change ${cls}">${statLabels[stat]} ${sign}${delta}</span>`;
+        }
+        changesEl.innerHTML = changesHtml;
+
+        overlay.classList.remove('hidden');
+    },
+
+    hideRisqueOverlay() {
+        const overlay = document.getElementById('risque-overlay');
+        if (overlay) overlay.classList.add('hidden');
+    },
 
     /* ─────────────────────────────────────────────────────────
        Utility

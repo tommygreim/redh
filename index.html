@@ -123,7 +123,7 @@
 
                 <!-- Opponent battlefield -->
                 <div class="battlefield-section opponent-section">
-                    <div class="section-label">Their creatures</div>
+                    <div class="section-label">Their battlefield</div>
                     <div class="battlefield" id="opp-battlefield">
                         <!-- Populated by JS -->
                     </div>
@@ -141,12 +141,13 @@
                     <div class="mana-info">
                         <span class="mana-label">Mana:</span>
                         <span id="mana-available">0</span>/<span id="mana-total">0</span>
+                        <span class="mana-pool-pips" id="mana-pool-display"></span>
                     </div>
                 </div>
 
                 <!-- Player battlefield -->
                 <div class="battlefield-section player-section">
-                    <div class="section-label">Your creatures</div>
+                    <div class="section-label">Your battlefield</div>
                     <div class="battlefield" id="player-battlefield">
                         <!-- Populated by JS -->
                     </div>
@@ -184,11 +185,37 @@
             </div>
         </div>
 
+        <!-- Priority window overlay (player responds to opponent spell) -->
+        <div id="priority-overlay" class="priority-overlay hidden">
+            <div class="priority-panel">
+                <div class="priority-title">⚡ Priority — They're casting a spell!</div>
+                <div class="priority-spell-wrap" id="priority-spell-info">
+                    <!-- Spell art and name populated by JS -->
+                </div>
+                <p class="priority-hint">You may respond with a counterspell, or pass priority to let it resolve.</p>
+                <div class="priority-actions" id="priority-actions">
+                    <!-- Counterspell buttons populated by JS -->
+                </div>
+                <button class="btn-secondary" onclick="Engine.passPriority()">Pass Priority — Let it resolve</button>
+            </div>
+        </div>
+
+        <!-- Risqué moment overlay -->
+        <div id="risque-overlay" class="risque-overlay hidden">
+            <div class="risque-panel">
+                <div class="risque-moment" id="risque-moment"></div>
+                <div class="risque-outcome" id="risque-outcome"></div>
+                <div class="risque-line" id="risque-line"></div>
+                <div class="risque-changes" id="risque-changes"></div>
+                <button class="btn-primary risque-continue-btn" onclick="UI.hideRisqueOverlay()">Continue the Duel</button>
+            </div>
+        </div>
+
         <!-- Blocker selection overlay -->
         <div id="blocker-overlay" class="blocker-overlay hidden">
             <div class="blocker-panel">
                 <div class="blocker-title">Assign Blockers</div>
-                <div class="blocker-instructions">Click one of your creatures, then click an attacker to block it.</div>
+                <div class="blocker-instructions">Toggle which creatures block each attacker. One creature can only block one attacker.</div>
                 <div id="blocker-area">
                     <!-- Attacker/blocker UI populated by JS -->
                 </div>

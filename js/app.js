@@ -78,13 +78,31 @@ const App = {
         // Show the game screen first
         UI.showScreen('game');
 
-        // Initialize the engine
+        // Initialize the engine, passing current relationship stats for risqué checks
+        const currentStats = this.state.relationships[charId];
+
         Engine.init(deckId, charId, {
-            onLog: (text, type) => UI.addLogEntry(text, type),
-            onReaction: (text) => UI.showReaction(text),
-            onRender: (state) => UI.renderGame(state),
+            onLog:      (text, type) => UI.addLogEntry(text, type),
+            onReaction: (text)       => UI.showReaction(text),
+            onRender:   (state)      => UI.renderGame(state),
             onGameOver: (metrics, gameState) => this._handleGameOver(metrics, gameState),
-        });
+            onRisque:   (cardId, outcome, changes, risque) => {
+                // Apply immediate stat changes to App state
+                const cId = this.state.selectedCharacter;
+                const stats = this.state.relationships[cId];
+                const updated = {};
+                for (const stat of ['love', 'attraction', 'inhibition', 'control']) {
+                    updated[stat] = Math.max(0, Math.min(100,
+                        Math.round((stats[stat] + (changes[stat] || 0)) * 10) / 10
+                    ));
+                }
+                this.state.relationships[cId] = updated;
+                this._saveState();
+
+                // Show the dramatic risqué overlay
+                UI.showRisqueResult(cardId, outcome, changes, risque);
+            },
+        }, currentStats);
     },
 
     /* ── Game Over ───────────────────────────────────────────── */

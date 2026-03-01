@@ -1184,3 +1184,254 @@ button {
     z-index: 200;
     font-style: italic;
 }
+
+/* ═══════════════════════════════════════════════════
+   V2 ADDITIONS
+   ═══════════════════════════════════════════════════ */
+
+/* Small mana pips for cost display */
+.pip-sm {
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 0.58rem !important;
+}
+
+/* Mana pool colored pip display in phase bar */
+.mana-pool-pips {
+    display: inline-flex;
+    gap: 2px;
+    align-items: center;
+    margin-left: 6px;
+}
+
+/* Summoning sickness — creature can't attack this turn */
+.permanent.sick {
+    opacity: 0.45;
+    filter: grayscale(0.5);
+}
+.permanent.sick::after {
+    content: '💤';
+    position: absolute;
+    top: 2px;
+    left: 3px;
+    font-size: 0.7rem;
+}
+
+/* Battlefield split rows */
+.battlefield-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: flex-end;
+    min-height: 30px;
+}
+.battlefield-creatures { margin-bottom: 4px; }
+.battlefield-lands     { border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px; }
+
+/* Land permanents are shorter */
+.permanent.land-permanent {
+    height: 80px;
+    width: 70px;
+    font-size: 0.6rem;
+}
+.permanent.land-W { border-color: rgba(200,180,140,0.5); }
+.permanent.land-U { border-color: rgba(74,144,217,0.5);  }
+.permanent.land-B { border-color: rgba(155,89,182,0.5);  }
+.permanent.land-R { border-color: rgba(231,76,60,0.5);   }
+.permanent.land-G { border-color: rgba(39,174,96,0.5);   }
+
+/* Risqué card marker */
+.risque-mark {
+    color: var(--color-love);
+    font-size: 0.7em;
+    vertical-align: super;
+}
+
+/* Updated blocker overlay */
+.blocker-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    padding: 8px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.blocker-attacker {
+    font-size: 0.9rem;
+    color: #e89090;
+    font-weight: bold;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 4px;
+}
+
+.blocker-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.blocker-assign-btn {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    background: rgba(64,128,224,0.2);
+    border: 1px solid rgba(64,128,224,0.3);
+    color: var(--text-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.blocker-assign-btn:hover   { background: rgba(64,128,224,0.4); }
+.blocker-assign-btn.assigned {
+    background: rgba(64,128,224,0.6);
+    border-color: rgba(64,180,224,0.8);
+    color: #c0e8ff;
+    font-weight: bold;
+}
+.blocker-pt { color: var(--text-muted); font-size: 0.7em; margin-left: 4px; }
+
+/* ─── Priority Window Overlay ─── */
+.priority-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.2s ease;
+}
+
+.priority-panel {
+    background: var(--bg-card);
+    border: 2px solid var(--mana-U);
+    border-radius: 14px;
+    padding: 28px 32px;
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(74,144,217,0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.priority-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--mana-U);
+    letter-spacing: 0.5px;
+}
+
+.priority-spell-wrap {
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: center;
+}
+
+.priority-spell-art  { font-size: 2rem; }
+.priority-spell-name { font-size: 1.1rem; color: var(--gold); font-weight: bold; }
+
+.priority-hint {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.priority-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.priority-actions button {
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #1a3060, #2a5090);
+    border: 1px solid var(--mana-U);
+    border-radius: 8px;
+    color: #c0e0ff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.priority-actions button:hover { background: linear-gradient(135deg, #2a4080, #4070b0); box-shadow: 0 0 10px rgba(74,144,217,0.4); }
+
+/* ─── Risqué Moment Overlay ─── */
+.risque-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 600;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.4s ease;
+}
+
+.risque-panel {
+    background: linear-gradient(160deg, #1a0820, #0a0818);
+    border: 2px solid var(--color-love);
+    border-radius: 16px;
+    padding: 36px 40px;
+    max-width: 520px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 12px 60px rgba(232,67,147,0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.risque-moment {
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-style: italic;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+.risque-outcome {
+    font-size: 1.1rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    padding: 8px 0;
+}
+.risque-outcome.risque-win  { color: #e884c4; text-shadow: 0 0 20px rgba(232,132,196,0.5); }
+.risque-outcome.risque-lose { color: #8888aa; text-shadow: none; }
+
+.risque-line {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-style: italic;
+    line-height: 1.5;
+}
+
+.risque-changes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.risque-stat-change {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: bold;
+}
+.risque-stat-change.pos { background: rgba(232,67,147,0.2); border: 1px solid rgba(232,67,147,0.4); color: #e884c4; }
+.risque-stat-change.neg { background: rgba(100,100,140,0.2); border: 1px solid rgba(100,100,140,0.4); color: #9999bb; }
+
+.risque-continue-btn {
+    margin-top: 4px;
+    align-self: center;
+    padding: 10px 28px;
+}
