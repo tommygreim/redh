@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Strixhaven Tabletop — MtG MVP</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Start screen -->
+  <div id="screen-start" class="screen-start">
+    <div class="start-card">
+      <h1>Strixhaven Tabletop</h1>
+      <p class="tagline">A minimal, rules-assisted Magic: The Gathering client.</p>
+      <p class="blurb">
+        Both players are controlled by you (hotseat). The app handles turns,
+        phases, mana, the stack, and combat math. Card text that isn't
+        automated is resolved manually with the per-card action buttons and the
+        board tools — so <b>every</b> card in the set is playable.
+      </p>
+      <button id="btn-start" class="btn btn-big">Quick Start (2 random 40-card decks)</button>
+      <div class="hint">Tip: tap lands for mana, then Cast. Use ＋Card to drop any card straight onto the board.</div>
+    </div>
+  </div>
+
+  <!-- Game screen -->
+  <div id="screen-game" style="display:none;">
+    <div id="phase-bar" class="phase-bar"></div>
+    <div class="board">
+      <div id="player-top" class="player-area"></div>
+      <div class="middle">
+        <div id="stack-zone" class="stack-zone"></div>
+        <div id="detail-zone" class="detail-zone"></div>
+        <div id="log-zone" class="log-zone"></div>
+      </div>
+      <div id="player-bottom" class="player-area"></div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal" style="display:none;">
+    <div class="modal-content"><div class="modal-body"></div></div>
+  </div>
+
+  <!-- Game over banner -->
+  <div id="gameover" class="gameover" style="display:none;">
+    <div class="go-box"><div class="go-text"></div>
+      <button class="btn" onclick="location.reload()">New Game</button></div>
+  </div>
+
+  <script src="cards.js"></script>
+  <script src="engine.js"></script>
+  <script src="ui.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
