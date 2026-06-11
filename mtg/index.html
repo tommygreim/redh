@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secrets of Strixhaven — Tabletop Client</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ════════ SETUP SCREEN ════════ -->
+<div id="setup-screen">
+  <div class="setup-inner">
+    <h1>Secrets of Strixhaven</h1>
+    <p class="subtitle">Two-seat tabletop client — one user pilots both players.</p>
+    <div class="setup-cols">
+      <div class="setup-col" id="setup-p0"></div>
+      <div class="setup-col" id="setup-p1"></div>
+    </div>
+    <div class="setup-options">
+      <label>First player:
+        <select id="opt-first">
+          <option value="0">Player 1</option>
+          <option value="1">Player 2</option>
+          <option value="random">Random</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="opt-skipdraw" checked> Player going first skips their first draw</label>
+    </div>
+    <div class="setup-actions">
+      <button class="btn big" id="btn-start">Start Game</button>
+      <button class="btn" id="btn-browse">Browse All Cards</button>
+    </div>
+    <div id="setup-errors"></div>
+  </div>
+</div>
+
+<!-- ════════ GAME SCREEN ════════ -->
+<div id="game-screen" class="hidden">
+  <header id="topbar"></header>
+  <main id="board">
+    <section id="area-p1" class="player-area flipped"></section>
+    <section id="center-bar">
+      <div id="stack-panel"><h3>Stack</h3><div id="stack-items"></div></div>
+      <div id="log-panel"><h3>Game Log</h3><div id="log-items"></div></div>
+    </section>
+    <section id="area-p0" class="player-area"></section>
+  </main>
+</div>
+
+<div id="action-menu" class="hidden"></div>
+<div id="modal-overlay" class="hidden"><div id="modal-box"></div></div>
+<div id="card-preview" class="hidden"></div>
+
+<script src="cards.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
